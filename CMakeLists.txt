@@ -9,7 +9,8 @@ include_directories(src)
 add_library(little_crypt
         include/little_crypt.h
         src/code_impl.cc
-        src/sha256.cc)
+        src/sha256.cc
+        src/hmac.cc)
 
 enable_testing()
 add_subdirectory(test)

@@ -6,6 +6,7 @@
 
 #include <memory>
 #include <string>
+#include <functional>
 
 namespace little_crypt {
 
@@ -124,6 +125,15 @@ T LocalEndian(const T& input) {
 
 // Take a SHA256 hash for a message.
 Code Sha256(const Code& message);
+
+// Take a hash for a message using specified hash algorithm and a key message.
+// The hash function is SHA256 on default.
+// To specify a hash algorithm, you must provide a hash function and a num
+// which is the chunk size of this algorithm.
+Code Hmac(const Code& message, const Code& key
+          , std::pair<std::function<Code(const Code&)>, size_t> hash
+          = {Sha256, 64});
+
 }  // namespace little_crypt
 
 #endif // LITTLE_CRYPT_H

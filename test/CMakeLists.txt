@@ -33,4 +33,12 @@ target_link_libraries(sha256_test
         ${GTEST_BOTH_LIBRARIES}
         pthread)
 
-gtest_discover_tests(code_impl_test switch_endian_test sha256_test)
+add_executable(hmac_test
+        hmac_test.cc)
+
+target_link_libraries(hmac_test
+        little_crypt
+        ${GTEST_BOTH_LIBRARIES}
+        pthread)
+
+gtest_discover_tests(code_impl_test switch_endian_test sha256_test hmac_test)

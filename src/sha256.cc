@@ -70,8 +70,9 @@ namespace {
 
   constexpr size_t chunk_size = 64;
   constexpr size_t target_size = 56;
+  constexpr size_t word_total = 64;
 
-  little_crypt::Code Preprocess(const little_crypt::Code& message) {
+little_crypt::Code Preprocess(const little_crypt::Code& message) {
     auto msg = message;
     msg += little_crypt::Code(std::string(1, 0x80));
     size_t need_byte = target_size - msg.value().size() % chunk_size;
@@ -86,7 +87,47 @@ namespace {
     return msg;
   }
 
-  little_crypt::Code Combine(const std::array<uint32_t , 8>& hash_array) {
+  std::array<uint32_t, word_total>
+  GenerateWords(const little_crypt::Code& msg, size_t pos) {
+    std::array<uint32_t, word_total> words{};
+    constexpr size_t word_size = 4;
+    constexpr size_t word_per_chunk = chunk_size / word_size;
+    for (size_t i = 0; i < word_per_chunk; ++i) {
+      uint32_t value = *reinterpret_cast<const uint32_t *>(msg.value().c_str()
+                                                           + pos
+                                                           + word_size * i);
+      words[i] = little_crypt::LocalEndian(value);
+    }
+    for (size_t i = word_per_chunk; i < word_total; ++i) {
+      words[i] = words[i - 16] + S0(words[i - 15]) + words[i - 7]
+                 + S1(words[i - 2]);
+    }
+    return words;
+  }
+
+  std::array<uint32_t, 8>
+  HashEvolution(const std::array<uint32_t, word_total>& words
+                , const std::array<uint32_t, 8>& hash) {
+    auto hash_raw = hash;
+    for (size_t i = 0; i < word_total; ++i) {
+      auto t1 = hash_raw[7] + EP1(hash_raw[4])
+                + CH(hash_raw[4], hash_raw[5], hash_raw[6])
+                + kK[i] + words[i];
+      auto t2 = EP0(hash_raw[0])
+                + MAJ(hash_raw[0], hash_raw[1], hash_raw[2]);
+
+      for (size_t j = 7; j > 0; --j) {
+        hash_raw[j] = hash_raw[j - 1];
+        if (j == 4) {
+          hash_raw[j] += t1;
+        }
+      }
+      hash_raw[0] = t1 + t2;
+    } // for word_total
+    return hash_raw;
+  }
+
+little_crypt::Code Combine(const std::array<uint32_t , 8>& hash_array) {
     little_crypt::Code result;
     for (auto v : hash_array) {
       uint32_t value = little_crypt::BigEndian(v);
@@ -100,45 +141,15 @@ namespace little_crypt {
   Code Sha256(const Code& message) {
     auto msg = message;
     msg = Preprocess(msg);
-
     // Divide to chunk and calculate hash value.
     auto chunk_count = msg.value().size() / chunk_size;
-    constexpr size_t word_total = 64;
     auto hash = kHashInit;
     for (size_t i = 0; i < chunk_count; ++i) {
       size_t pos = i * chunk_size;
-      std::array<uint32_t, word_total> words{};
-      constexpr size_t word_size = 4;
-      constexpr size_t word_per_chunk = chunk_size / word_size;
-      for (size_t j = 0; j < word_per_chunk; ++j) {
-        uint32_t value = *reinterpret_cast<const uint32_t *>(msg.value().c_str()
-                                                            + pos
-                                                            + word_size * j);
-        words[j] = LocalEndian(value);
-      }
-      for (size_t j = word_per_chunk; j < word_total; ++j) {
-        words[j] = words[j - 16] + S0(words[j - 15]) + words[j - 7]
-                   + S1(words[j - 2]);
-      }
-
-      auto hash_raw = hash;
-      for (size_t j = 0; j < word_total; ++j) {
-        auto t1 = hash_raw[7] + EP1(hash_raw[4])
-                  + CH(hash_raw[4], hash_raw[5], hash_raw[6])
-                  + kK[j] + words[j];
-        auto t2 = EP0(hash_raw[0])
-                  + MAJ(hash_raw[0], hash_raw[1], hash_raw[2]);
-        for (size_t k = 7; k > 0; --k) {
-          hash_raw[k] = hash_raw[k - 1];
-          if (k == 4) {
-            hash_raw[k] += t1;
-          }
-        }
-        hash_raw[0] = t1 + t2;
-      } // for word_total
-      for (size_t j = 0; j < hash.size(); ++j) {
+      auto words = GenerateWords(msg, pos);
+      auto hash_raw = HashEvolution(words, hash);
+      for (size_t j = 0; j < hash.size(); ++j)
         hash[j] += hash_raw[j];
-      }
     } // for chunk_count
     return Combine(hash);
   } // Sha256
