@@ -14,10 +14,10 @@ TEST(Sha256, Preprocess) {
   EXPECT_EQ(turn.HexValue(), "48656c6c6f576f726c64800000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000050");
 }
 
-TEST(Sha256, Combine) {
+TEST(Sha256, HashCombine) {
   std::array<uint32_t, 8> hash{0x1234, 0x5678, 0x9abc, 0xdef0
                                , 0x1122, 0x2233, 0x3344, 0x4455};
-  auto turn = Combine(hash);
+  auto turn = HashCombine(hash);
   ASSERT_EQ(turn.value().size(), 32);
   EXPECT_EQ(turn.HexValue(), "000012340000567800009abc0000def000001122000022330000334400004455");
 }

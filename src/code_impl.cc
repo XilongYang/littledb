@@ -71,6 +71,10 @@ bool Code::operator==(const Code& code) const {
   return this->value() == code.value();
 }
 
+bool Code::operator!=(const Code& code) const {
+  return this->value() != code.value();
+}
+
 const Code Code::operator+(const Code& code) const {
   return Code(this->value() + code.value());
 }

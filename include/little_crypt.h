@@ -7,11 +7,12 @@
 #include <memory>
 #include <string>
 #include <functional>
+#include <stdexcept>
 
 namespace little_crypt {
 
 // The class provides a type which can be used by crypt functions.
-// The class can be constructed with std::strings.
+// The class can be constructed with std::string.
 // The class supports copy and move operations.
 // Use code.value() to get a std::string.
 // Use + operator to connect 2 or more Codes.
@@ -35,13 +36,14 @@ class Code {
 
   // Judge if the inner codes are same.
   bool operator==(const Code& code) const;
+  bool operator!=(const Code& code) const;
 
   // Append 'code' to the end of the object.
   const Code operator+(const Code& code) const;
 
   Code& operator+=(const Code& code);
 
-  // The function provides a transform from inner types to Code
+  // The function provides a transform from inner types to Code.
   // Note it only worked for the top type, that means
   // if you pass a pointer in the function, it will only transform
   // the pointer itself rather than the object that the pointer referenced.
@@ -72,6 +74,12 @@ class CodableInterface {
  public:
   virtual Code Encode() = 0;
   virtual void Decode(const Code& c) = 0;
+};
+
+// Exception class using for errors from CodableInterface.Decode()
+class DecodeError : public std::logic_error {
+ public:
+  explicit DecodeError(const std::string& s) : std::logic_error(s) {}
 };
 
 // The following functions provides switch between small endian and big endian.
@@ -123,16 +131,33 @@ T LocalEndian(const T& input) {
   return SwitchEndian(input);
 }
 
-// Take a SHA256 hash for a message.
+// Take the SHA256 hash for a message.
 Code Sha256(const Code& message);
 
-// Take a hash for a message using specified hash algorithm and a key message.
+// Take the hash for a message using specified hash algorithm and a key message.
 // The hash function is SHA256 on default.
 // To specify a hash algorithm, you must provide a hash function and a num
 // which is the chunk size of this algorithm.
 Code Hmac(const Code& message, const Code& key
           , std::pair<std::function<Code(const Code&)>, size_t> hash
           = {Sha256, 64});
+
+// Take the ciphertext for a pair of a plaintext and a key using AES128 algorithm.
+// The key will be processed by SHA256 algorithm and truncate to 128bit.
+// If the text length (by bits) is not divisible by 128, it will be padded
+// with 0 at the end till the length is divisible by 128.
+Code Aes128Encrypt(const Code& plaintext, const Code& key);
+
+// Take the plaintext for a pair of a ciphertext and a key using AES128 algorithm.
+// The key will be processed by SHA256 algorithm and truncate to 128bit.
+// If the text length (by bits) is not divisible by 128, the function will throw
+// an exception.
+Code Aes128Decrypt(const Code& ciphertext, const Code& key);
+
+// Exception class using for errors form Aes128Decrypt()
+class DecryptError : public std::logic_error {
+  explicit DecryptError(const std::string &s) : std::logic_error(s) {}
+};
 
 }  // namespace little_crypt
 

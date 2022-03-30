@@ -35,7 +35,7 @@ namespace {
     return ((input >> bits) | (input << (size - bits)));
   }
 
-// Some function defined by sha256
+  // Some function defined by sha256
   inline uint32_t S0(uint32_t x) {
       return CROR(x, 7)
            ^ CROR(x, 18)
@@ -72,9 +72,9 @@ namespace {
   constexpr size_t target_size = 56;
   constexpr size_t word_total = 64;
 
-little_crypt::Code Preprocess(const little_crypt::Code& message) {
+  little_crypt::Code Preprocess(const little_crypt::Code& message) {
     auto msg = message;
-    msg += little_crypt::Code(std::string(1, 0x80));
+    msg += little_crypt::Code(std::string(1, static_cast<char>(0x80)));
     size_t need_byte = target_size - msg.value().size() % chunk_size;
     if (need_byte < 0)
       need_byte += 64;
@@ -127,7 +127,7 @@ little_crypt::Code Preprocess(const little_crypt::Code& message) {
     return hash_raw;
   }
 
-little_crypt::Code Combine(const std::array<uint32_t , 8>& hash_array) {
+  little_crypt::Code HashCombine(const std::array<uint32_t , 8>& hash_array) {
     little_crypt::Code result;
     for (auto v : hash_array) {
       uint32_t value = little_crypt::BigEndian(v);
@@ -151,6 +151,6 @@ namespace little_crypt {
       for (size_t j = 0; j < hash.size(); ++j)
         hash[j] += hash_raw[j];
     } // for chunk_count
-    return Combine(hash);
+    return HashCombine(hash);
   } // Sha256
 }  // namespace little_crypt
