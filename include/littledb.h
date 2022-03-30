@@ -1,15 +1,25 @@
 // Created by Xilong Yang on 2022-03-11.
 //
 
-#ifndef LITTLE_CRYPT_H
-#define LITTLE_CRYPT_H
+#ifndef LITTLEDB_H
+#define LITTLEDB_H
 
-#include <memory>
-#include <string>
 #include <functional>
 #include <stdexcept>
+#include <string>
 
-namespace little_crypt {
+namespace littledb{
+// Using the 8bit unsigned int for Byte type.
+using Byte = uint8_t;
+
+// Using the string which contains 8bit unsigned int for ByteString type.
+using ByteString = std::basic_string<Byte>;
+
+// Using std::size_t as our size type.
+using std::size_t;
+
+ByteString ToByteString(const std::string& str);
+ByteString ToByteString(const char* c_ptr, size_t size);
 
 // The class provides a type which can be used by crypt functions.
 // The class can be constructed with std::string.
@@ -19,20 +29,13 @@ namespace little_crypt {
 // Use Code::BaseToCode() to convert base type to code.
 class Code {
  public:
-  Code();
-  ~Code();
-  Code(const Code&);
-  Code(Code&&) noexcept;
-  Code& operator=(const Code&);
-  Code& operator=(Code&&) noexcept;
-
-  explicit Code(const std::string& value);
+  explicit Code(const ByteString& bytes = ByteString());
 
   // Get the inner value by a std::string.
-  [[nodiscard]] const std::string& value() const;
+  [[nodiscard]] const ByteString& value() const;
 
-  // Get the hex representation of the inner value by a std::string.
-  [[nodiscard]] std::string HexValue() const;
+  // Get the hex representation of the inner value by a Byte[].
+  [[nodiscard]] ByteString HexValue() const;
 
   // Judge if the inner codes are same.
   bool operator==(const Code& code) const;
@@ -54,8 +57,8 @@ class Code {
   // on system) that is the code of the pointer.
   template <typename T>
   static Code BaseToCode(const T& target) {
-    std::string result;
-    const char* p = reinterpret_cast<const char*>(&target);
+    ByteString result;
+    auto p = reinterpret_cast<const Byte*>(&target);
     for (int i = 0; i < sizeof(T); ++i) {
       result.push_back(*(p + i));
     }
@@ -63,8 +66,7 @@ class Code {
   }
 
  private:
-  class CodeImpl;
-  std::unique_ptr<CodeImpl> impl_;
+  ByteString value_;
 };  // class Code
 
 
@@ -159,6 +161,6 @@ class DecryptError : public std::logic_error {
   explicit DecryptError(const std::string &s) : std::logic_error(s) {}
 };
 
-}  // namespace little_crypt
+}  // namespace littledb
 
-#endif // LITTLE_CRYPT_H
+#endif  // LITTLEDB_H

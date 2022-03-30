@@ -1,38 +1,40 @@
 // Created by Xilong Yang on 2022-03-19.
 //
 
-#include "little_crypt.h"
+#include "littledb.h"
 
 #include <gtest/gtest.h>
 
+using namespace littledb;
+
 TEST(SwitchEndian, SwitchEndian) {
   constexpr uint16_t test = 0x1234;
-  EXPECT_EQ(little_crypt::SwitchEndian(test), 0x3412);
+  EXPECT_EQ(SwitchEndian(test), 0x3412);
 }
 
 TEST(SwitchEndian, BigEndian) {
   constexpr uint16_t test = 0x1234;
-  if (little_crypt::SystemIsBigEndian()) {
-    EXPECT_EQ(little_crypt::BigEndian(test), test);
+  if (SystemIsBigEndian()) {
+    EXPECT_EQ(BigEndian(test), test);
   } else {
-    EXPECT_EQ(little_crypt::BigEndian(test), little_crypt::SwitchEndian(test));
+    EXPECT_EQ(BigEndian(test), SwitchEndian(test));
   }
 }
 
 TEST(SwitchEndian, SmallEndian) {
   constexpr uint16_t test = 0x1234;
-  if (little_crypt::SystemIsBigEndian()) {
-    EXPECT_EQ(little_crypt::SmallEndian(test), little_crypt::SwitchEndian(test));
+  if (SystemIsBigEndian()) {
+    EXPECT_EQ(SmallEndian(test), SwitchEndian(test));
   } else {
-    EXPECT_EQ(little_crypt::SmallEndian(test), test);
+    EXPECT_EQ(SmallEndian(test), test);
   }
 }
 
 TEST(SwitchEndian, LocalEndian) {
   constexpr uint16_t test = 0x1234;
-  if (little_crypt::SystemIsBigEndian()) {
-    EXPECT_EQ(little_crypt::LocalEndian(test), test);
+  if (SystemIsBigEndian()) {
+    EXPECT_EQ(LocalEndian(test), test);
   } else {
-    EXPECT_EQ(little_crypt::LocalEndian(test), little_crypt::SwitchEndian(test));
+    EXPECT_EQ(LocalEndian(test), SwitchEndian(test));
   }
 }

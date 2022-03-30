@@ -1,82 +1,54 @@
 // Created by Xilong Yang on 2022-03-11.
 //
 
-#include "little_crypt.h"
+#include "littledb.h"
 
-#include <string>
-#include <sstream>
-#include <iomanip>
-
-namespace little_crypt {
-class Code::CodeImpl {
- public:
-  CodeImpl() = default;
-  ~CodeImpl() = default;
-  CodeImpl(const CodeImpl&) = default;
-  CodeImpl(CodeImpl&&) = default;
-
-  explicit CodeImpl(const std::string& value) : value_(value) {}
-  explicit CodeImpl(const char* c_ptr, const std::size_t& size)
-      : value_(c_ptr, size) {}
-
-  [[nodiscard]] const std::string& value() const { return value_;}
-
- private:
-  std::string value_;
-};
-
-Code::Code() {
-    impl_ = std::make_unique<Code::CodeImpl>("");
-};
-
-Code::~Code() = default;
-
-Code::Code(const Code& code) {
-  impl_ = std::make_unique<Code::CodeImpl>(code.value());
-}
-
-Code::Code(Code&& code) noexcept {
-  impl_ = std::move(code.impl_);
-}
-
-Code& Code::operator=(const Code& code) {
-  impl_ = std::make_unique<CodeImpl>(code.value());
-  return *this;
-};
-
-Code& Code::operator=(Code&& code) noexcept {
-  impl_ = std::move(code.impl_);
-  return *this;
-};
-
-Code::Code(const std::string& value) {
-  impl_ = std::make_unique<Code::CodeImpl>(value);
-}
-
-const std::string& Code::value() const { return impl_->value(); }
-
-std::string Code::HexValue() const {
-  std::ostringstream hex_stream;
-  hex_stream << std::hex << std::setfill('0') << std::right;
-
-  auto raw_value = impl_->value();
-  for (const auto &c : raw_value) {
-    hex_stream << std::setw(2) << (0x00ff & static_cast<const uint16_t>(c));
+namespace littledb{
+ByteString ToByteString(const std::string& str) {
+  ByteString result(str.size(), 0);
+  for (int i = 0; i < str.size(); ++i) {
+    result[i] = str[i];
   }
+  return result;
+}
 
-  return hex_stream.str();
+ByteString ToByteString(const char* c_ptr, size_t size) {
+  ByteString result(size, 0);
+  for (int i = 0; i < size; ++i) {
+    result[i] = c_ptr[i];
+  }
+  return result;
+}
+
+Code::Code(const ByteString& value) {
+  value_ = value;
+}
+
+const ByteString & Code::value() const { return value_; }
+
+ByteString Code::HexValue() const {
+  ByteString hex_value;
+  for (const auto &c : value_) {
+    const Byte kHexMap[16]{'0', '1', '2', '3'
+                           , '4', '5', '6', '7'
+                           , '8', '9', 'a', 'b'
+                           , 'c', 'd', 'e', 'f'};
+    hex_value.push_back(kHexMap[c / 16]);
+    hex_value.push_back(kHexMap[c % 16]);
+  }
+  return hex_value;
 }
 
 bool Code::operator==(const Code& code) const {
-  return this->value() == code.value();
+  return value() == code.value();
 }
 
 bool Code::operator!=(const Code& code) const {
-  return this->value() != code.value();
+  return value() != code.value();
 }
 
 const Code Code::operator+(const Code& code) const {
-  return Code(this->value() + code.value());
+  return Code(value() + code.value());
 }
 
 Code& Code::operator+=(const Code& code) {
@@ -84,4 +56,4 @@ Code& Code::operator+=(const Code& code) {
   return *this;
 }
 
-}  // namespace little_crypt
+}  // namespace littledb

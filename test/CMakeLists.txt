@@ -9,50 +9,17 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
 
 enable_testing()
 
-add_executable(code_impl_test
-        code_impl_test.cc)
+add_executable(all_test
+        code_impl_test.cc
+        switch_endian_test.cc
+        sha256_test.cc
+        hmac_test.cc
+        aes128_test.cc
+        )
 
-target_link_libraries(code_impl_test
+target_link_libraries(all_test
         little_crypt
         ${GTEST_BOTH_LIBRARIES}
         pthread)
 
-add_executable(switch_endian_test
-        switch_endian_test.cc)
-
-target_link_libraries(switch_endian_test
-        little_crypt
-        ${GTEST_BOTH_LIBRARIES}
-        pthread)
-
-add_executable(sha256_test
-        sha256_test.cc)
-
-target_link_libraries(sha256_test
-        little_crypt
-        ${GTEST_BOTH_LIBRARIES}
-        pthread)
-
-add_executable(hmac_test
-        hmac_test.cc)
-
-target_link_libraries(hmac_test
-        little_crypt
-        ${GTEST_BOTH_LIBRARIES}
-        pthread)
-
-add_executable(aes128_test
-        aes128_test.cc)
-
-target_link_libraries(aes128_test
-        little_crypt
-        ${GTEST_BOTH_LIBRARIES}
-        pthread)
-
-gtest_discover_tests(
-        code_impl_test
-        switch_endian_test
-        sha256_test
-        hmac_test
-        aes128_test
-)
+gtest_discover_tests(all_test)

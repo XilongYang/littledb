@@ -5,6 +5,8 @@
 
 #include <gtest/gtest.h>
 
+using namespace littledb;
+
 TEST(State, ConstructAndEqual) {
   State state;
   State state1(state);
@@ -21,41 +23,41 @@ TEST(State, ConstructAndEqual) {
 }
 
 TEST(State, EncodeAndDecode) {
-  little_crypt::Code code("The length is 16");
+  Code code(ToByteString("The length is 16"));
   State state(code);
   EXPECT_EQ(code, state.Encode());
 
-  little_crypt::Code code1("The length is not 16");
+  Code code1(ToByteString("The length is not 16"));
   State state1;
-  EXPECT_THROW(state1.Decode(code1), little_crypt::DecodeError);
+  EXPECT_THROW(state1.Decode(code1), DecodeError);
 }
 
 TEST(State, Operator) {
-  little_crypt::Code code(std::string(16, 'a'));
+  Code code(ByteString(16, 'a'));
   State state(code);
 
   state[2] = 'b';
-  EXPECT_EQ(state.Encode(), little_crypt::Code("aabaaaaaaaaaaaaa"));
+  EXPECT_EQ(state.Encode(), Code(ToByteString("aabaaaaaaaaaaaaa")));
 
   state[3] = 'c';
-  EXPECT_EQ(state.Encode(), little_crypt::Code("aabcaaaaaaaaaaaa"));
+  EXPECT_EQ(state.Encode(), Code(ToByteString("aabcaaaaaaaaaaaa")));
 
   const auto state1 = state;
   state[0] = state1[2];
-  EXPECT_EQ(state.Encode(), little_crypt::Code("babcaaaaaaaaaaaa"));
+  EXPECT_EQ(state.Encode(), Code(ToByteString("babcaaaaaaaaaaaa")));
 }
 
 TEST(State, Xor) {
-  std::string str1(16, 'a');
-  std::string str2(16, 'b');
-  std::string str3(16, 0);
+  ByteString str1(16, 'a');
+  ByteString str2(16, 'b');
+  ByteString str3(16, 0);
   for (int i = 0; i < 16; ++i) {
     str3[i] = str1[i]^str2[i];
   }
 
-  little_crypt::Code code1(str1);
-  little_crypt::Code code2(str2);
-  little_crypt::Code code3(str3);
+  Code code1(str1);
+  Code code2(str2);
+  Code code3(str3);
 
   State state1(code1);
   State state2(code2);

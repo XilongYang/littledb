@@ -1,20 +1,21 @@
 // Created by Xilong Yang on 2022-03-20.
 //
 
-#include "little_crypt.h"
+#include "littledb.h"
 
+
+namespace littledb {
 namespace {
-  little_crypt::Code XOR(const little_crypt::Code& code, uint8_t pad) {
+  Code XOR(const Code& code, uint8_t pad) {
     auto str = code.value();
     for (auto &c : str) {
       c ^= pad;
     }
-    return little_crypt::Code(str);
+    return Code(str);
   }
 }
 
-namespace little_crypt {
-  Code Hmac(const Code& message, const Code& key
+Code Hmac(const Code& message, const Code& key
             , std::pair<std::function<Code(const Code&)>, size_t> hash) {
     auto hash_algorithm = hash.first;
     auto chunk_size = hash.second;
@@ -26,7 +27,7 @@ namespace little_crypt {
     if (padded_key.value().size() > chunk_size) {
       padded_key = hash_algorithm(padded_key);
     } else {
-      padded_key += Code(std::string(
+      padded_key += Code(ByteString(
           chunk_size - padded_key.value().size(), 0x00));
     }
 

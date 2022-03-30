@@ -1,19 +1,22 @@
 // Created by Xilong Yang on 2022-03-11.
 //
 
-#include "little_crypt.h"
+#include "littledb.h"
 
 #include <array>
 #include <cstdint>
 
+using std::array;
+
+namespace littledb{
 namespace {
   // 8 initialized values of hash function.
-  const std::array<uint32_t, 8> kHashInit =
+  const array<uint32_t, 8> kHashInit =
       {0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a
       ,0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19};
 
   // 64 constant of hash function
-  const std::array<uint32_t, 64> kK =
+  const array<uint32_t, 64> kK =
       {0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b
       ,0x59f111f1, 0x923f82a4, 0xab1c5ed5, 0xd807aa98, 0x12835b01
       ,0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe, 0x9bdc06a7
@@ -72,23 +75,23 @@ namespace {
   constexpr size_t target_size = 56;
   constexpr size_t word_total = 64;
 
-  little_crypt::Code Preprocess(const little_crypt::Code& message) {
+  Code Preprocess(const Code& message) {
     auto msg = message;
-    msg += little_crypt::Code(std::string(1, static_cast<char>(0x80)));
+    msg += Code(ByteString (1, static_cast<char>(0x80)));
     size_t need_byte = target_size - msg.value().size() % chunk_size;
     if (need_byte < 0)
       need_byte += 64;
 
-    msg += little_crypt::Code(std::string(need_byte, 0x00));
+    msg += Code(ByteString (need_byte, 0x00));
 
-    uint64_t length = little_crypt::BigEndian(
+    uint64_t length = BigEndian(
         message.value().size() * 8);
-    msg += little_crypt::Code::BaseToCode(length);
+    msg += Code::BaseToCode(length);
     return msg;
   }
 
-  std::array<uint32_t, word_total>
-  GenerateWords(const little_crypt::Code& msg, size_t pos) {
+  array<uint32_t, word_total>
+  GenerateWords(const Code& msg, size_t pos) {
     std::array<uint32_t, word_total> words{};
     constexpr size_t word_size = 4;
     constexpr size_t word_per_chunk = chunk_size / word_size;
@@ -96,7 +99,7 @@ namespace {
       uint32_t value = *reinterpret_cast<const uint32_t *>(msg.value().c_str()
                                                            + pos
                                                            + word_size * i);
-      words[i] = little_crypt::LocalEndian(value);
+      words[i] = LocalEndian(value);
     }
     for (size_t i = word_per_chunk; i < word_total; ++i) {
       words[i] = words[i - 16] + S0(words[i - 15]) + words[i - 7]
@@ -105,9 +108,9 @@ namespace {
     return words;
   }
 
-  std::array<uint32_t, 8>
-  HashEvolution(const std::array<uint32_t, word_total>& words
-                , const std::array<uint32_t, 8>& hash) {
+  array<uint32_t, 8>
+  HashEvolution(const array<uint32_t, word_total>& words
+                , const array<uint32_t, 8>& hash) {
     auto hash_raw = hash;
     for (size_t i = 0; i < word_total; ++i) {
       auto t1 = hash_raw[7] + EP1(hash_raw[4])
@@ -127,17 +130,16 @@ namespace {
     return hash_raw;
   }
 
-  little_crypt::Code HashCombine(const std::array<uint32_t , 8>& hash_array) {
-    little_crypt::Code result;
+  Code HashCombine(const std::array<uint32_t , 8>& hash_array) {
+    Code result;
     for (auto v : hash_array) {
-      uint32_t value = little_crypt::BigEndian(v);
-      result += little_crypt::Code::BaseToCode(value);
+      uint32_t value = BigEndian(v);
+      result += Code::BaseToCode(value);
     }
     return result;
   }
 }
 
-namespace little_crypt {
   Code Sha256(const Code& message) {
     auto msg = message;
     msg = Preprocess(msg);
@@ -153,4 +155,4 @@ namespace little_crypt {
     } // for chunk_count
     return HashCombine(hash);
   } // Sha256
-}  // namespace little_crypt
+}  // namespace littledb

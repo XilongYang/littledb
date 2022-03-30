@@ -1,28 +1,34 @@
 // Created by Xilong Yang on 2022-03-16.
 //
 
-#include "little_crypt.h"
+#include "code_impl.cc"
 
 #include <gtest/gtest.h>
 
-#include <string>
+using namespace littledb;
+
+TEST(ByteString, ToByteString) {
+  ByteString str1{'H', 'e', 'l', 'l', 'o'};
+  auto str2 = ToByteString("Hello");
+  auto str3 = ToByteString("Hello", 5);
+
+  EXPECT_EQ(str1, str2);
+  EXPECT_EQ(str1, str3);
+}
 
 TEST(Code, CodeConstruct) {
-  little_crypt::Code code;
-  EXPECT_EQ("", code.value());
+  Code code;
+  EXPECT_EQ(code.value(), ToByteString(""));
 
-  little_crypt::Code code1("Hello");
-  EXPECT_EQ("Hello", code1.value());
+  Code code1(ToByteString("Hello"));
+  EXPECT_EQ(code1.value(), ToByteString("Hello"));
 
-  little_crypt::Code code2({"", 0});
-  EXPECT_EQ("", code2.value());
-
-  little_crypt::Code code3({"World", 5});
-  EXPECT_EQ("World", code3.value());
+  Code code2((ByteString()));
+  EXPECT_EQ(code2.value(), ByteString());
 }
 
 TEST(Code, CopyAndMove) {
-  little_crypt::Code code("Test");
+  Code code(littledb::ToByteString("Test"));
 
   auto code1 = code;
   EXPECT_EQ(code.value(), code1.value());
@@ -38,34 +44,34 @@ TEST(Code, CopyAndMove) {
 }
 
 TEST(Code, HexValue) {
-  little_crypt::Code code("");
-  EXPECT_EQ(code.HexValue(), "");
+  Code code;
+  EXPECT_EQ(code.HexValue(), ToByteString(""));
 
-  little_crypt::Code code1(std::string(1, 0x12));
-  EXPECT_EQ(code1.HexValue(), "12");
+  Code code1(ByteString(1, 0x12));
+  EXPECT_EQ(code1.HexValue(), ToByteString("12"));
 
-  little_crypt::Code code2(std::string(4, 0x12));
-  EXPECT_EQ(code2.HexValue(), "12121212");
+  Code code2(ByteString (4, 0x12));
+  EXPECT_EQ(code2.HexValue(), ToByteString("12121212"));
 
-  little_crypt::Code code3(std::string(2, 0x12));
-  code3 += little_crypt::Code(std::string(2, 0x00));
-  code3 += little_crypt::Code(std::string(2, 0xf0));
-  code3 += little_crypt::Code(std::string(2, 0xff));
-  EXPECT_EQ(code3.HexValue(), "12120000f0f0ffff");
+  Code code3(ByteString (2, 0x12));
+  code3 += Code(ByteString (2, 0x00));
+  code3 += Code(ByteString (2, 0xf0));
+  code3 += Code(ByteString (2, 0xff));
+  EXPECT_EQ(code3.HexValue(), ToByteString("12120000f0f0ffff"));
 }
 
 TEST(Code, Operator) {
-  little_crypt::Code code1("Hello");
-  little_crypt::Code code2("World");
+  Code code1(ToByteString("Hello"));
+  Code code2(ToByteString("World"));
 
   EXPECT_EQ(code1, code1);
   EXPECT_EQ(code2, code2);
 
-  EXPECT_EQ(code1 + code2, little_crypt::Code(code1.value() + code2.value()));
-  EXPECT_EQ((code1 + code2).value(), "HelloWorld");
+  EXPECT_EQ(code1 + code2, Code(code1.value() + code2.value()));
+  EXPECT_EQ((code1 + code2).value(), ToByteString("HelloWorld"));
 
   code1 += code2;
-  EXPECT_EQ(code1.value(), "HelloWorld");
+  EXPECT_EQ(code1.value(), ToByteString("HelloWorld"));
 }
 
 TEST(Code, BaseToCode) {
@@ -74,34 +80,43 @@ TEST(Code, BaseToCode) {
   uint32_t i = 0x00010203;
   uint64_t l = 0x0001020304050607;
 
-  if (little_crypt::SystemIsBigEndian()) {
-    EXPECT_EQ(little_crypt::Code::BaseToCode(c).HexValue(), "00");
-    EXPECT_EQ(little_crypt::Code::BaseToCode(s).HexValue(), "0001");
-    EXPECT_EQ(little_crypt::Code::BaseToCode(i).HexValue(), "00010213");
-    EXPECT_EQ(little_crypt::Code::BaseToCode(l).HexValue(), "0001020304050607");
+  if (SystemIsBigEndian()) {
+    EXPECT_EQ(Code::BaseToCode(c).HexValue()
+                  , ToByteString("00"));
+    EXPECT_EQ(Code::BaseToCode(s).HexValue()
+                  , ToByteString("0001"));
+    EXPECT_EQ(Code::BaseToCode(i).HexValue()
+                  , ToByteString("00010213"));
+    EXPECT_EQ(Code::BaseToCode(l).HexValue()
+                  , ToByteString("0001020304050607"));
   } else {
-    EXPECT_EQ(little_crypt::Code::BaseToCode(c).HexValue(), "00");
-    EXPECT_EQ(little_crypt::Code::BaseToCode(s).HexValue(), "0100");
-    EXPECT_EQ(little_crypt::Code::BaseToCode(i).HexValue(), "03020100");
-    EXPECT_EQ(little_crypt::Code::BaseToCode(l).HexValue(), "0706050403020100");
+    EXPECT_EQ(Code::BaseToCode(c).HexValue()
+                  , ToByteString("00"));
+    EXPECT_EQ(Code::BaseToCode(s).HexValue()
+                  , ToByteString("0100"));
+    EXPECT_EQ(Code::BaseToCode(i).HexValue()
+                  , ToByteString("03020100"));
+    EXPECT_EQ(Code::BaseToCode(l).HexValue()
+                  , ToByteString("0706050403020100"));
   }
 }
 
-class CodableTest : public little_crypt::CodableInterface {
+class CodableTest : public CodableInterface {
  public:
-  explicit CodableTest(char c = 0, int i = 0, double d = 0, const std::string& s = "")
+  explicit CodableTest(char c = 0, int i = 0, double d = 0
+                       , const ByteString &s = ByteString())
       : c_(c), i_(i), d_(d), s_(s) {}
 
-  little_crypt::Code Encode() override {
-    little_crypt::Code result;
-    result += little_crypt::Code::BaseToCode(c_);
-    result += little_crypt::Code::BaseToCode(i_);
-    result += little_crypt::Code::BaseToCode(d_);
-    result += little_crypt::Code(s_);
+  Code Encode() override {
+    Code result;
+    result += Code::BaseToCode(c_);
+    result += Code::BaseToCode(i_);
+    result += Code::BaseToCode(d_);
+    result += Code(s_);
     return result;
   }
 
-  void Decode(const little_crypt::Code& code) override {
+  void Decode(const Code& code) override {
     size_t base_size = sizeof(c_) + sizeof(i_) + sizeof(d_);
     if (code.value().size() < base_size)
       return;
@@ -118,7 +133,7 @@ class CodableTest : public little_crypt::CodableInterface {
   char c_;
   int i_;
   double d_;
-  std::string s_;
+  ByteString s_;
 };
 
 TEST(CodableInterface, CodableTest) {
@@ -126,7 +141,7 @@ TEST(CodableInterface, CodableTest) {
   test.c_ = 'c';
   test.i_ = 4;
   test.d_ = 2.333;
-  test.s_ = "Hello";
+  test.s_ = ToByteString("Hello");
   auto code = test.Encode();
   CodableTest test1;
   test1.Decode(code);
