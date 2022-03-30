@@ -36,14 +36,14 @@ TEST(State, Operator) {
   Code code(ByteString(16, 'a'));
   State state(code);
 
-  state[2] = 'b';
+  state[2][0] = 'b';
   EXPECT_EQ(state.Encode(), Code(ToByteString("aabaaaaaaaaaaaaa")));
 
-  state[3] = 'c';
+  state[3][0] = 'c';
   EXPECT_EQ(state.Encode(), Code(ToByteString("aabcaaaaaaaaaaaa")));
 
   const auto state1 = state;
-  state[0] = state1[2];
+  state[0][0] = state1[2][0];
   EXPECT_EQ(state.Encode(), Code(ToByteString("babcaaaaaaaaaaaa")));
 }
 
@@ -68,4 +68,36 @@ TEST(State, Xor) {
 
   state1 ^= state2;
   EXPECT_EQ(state1, xor_state);
+}
+
+TEST(State, SubBytes) {
+  ByteString origin{  0x19, 0x3d, 0xe3, 0xbe
+                    , 0xa0, 0xf4, 0xe2, 0x2b
+                    , 0x9a, 0xc6, 0x8d, 0x2a
+                    , 0xe9, 0xf8, 0x48, 0x08};
+
+  ByteString except{  0xd4, 0x27, 0x11, 0xae
+                    , 0xe0, 0xbf, 0x98, 0xf1
+                    , 0xb8, 0xb4, 0x5d, 0xe5
+                    , 0x1e, 0x41, 0x52, 0x30};
+
+  State state((Code(origin)));
+  state.SubBytes();
+  EXPECT_EQ(state.Encode().value(), except);
+}
+
+TEST(State, ShiftRows) {
+  ByteString origin{1, 5, 9, 13
+                  , 2, 6, 10, 14
+                  , 3, 7, 11, 15
+                  , 4, 8, 12, 16};
+
+  ByteString except{1, 5, 9, 13
+                  , 6, 10, 14, 2
+                  , 11, 15, 3, 7
+                  , 16, 4, 8, 12};
+
+  State state((Code(origin)));
+  state.ShiftRows();
+  EXPECT_EQ(state.Encode().value(), except);
 }

@@ -71,7 +71,7 @@ class Code {
 
 
 
-// The interface makes the implements can be encoded or decoded.
+// The interface makes implements can be encoded or decoded.
 class CodableInterface {
  public:
   virtual Code Encode() = 0;
