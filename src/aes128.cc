@@ -10,9 +10,42 @@ namespace littledb{
 namespace {
 using std::array;
 
-  class State : public CodableInterface {
-   public:
-    explicit State(const Code& code = Code()) : value_() {
+  // The plus operation defined on GF(2^8)
+  Byte GfPlus(const Byte& a, const Byte& b) {
+    return a^b;
+  }
+
+  // The multiple Operation defined on GF(2^8)
+  Byte GfMultiple(Byte a, Byte b) {
+    if (a == 0) {
+      return 0;
+    }
+    if (a == 1) {
+      return b;
+    }
+    if (a == 2) {
+      // 0x80: 10000000
+      if (b&0x80) {
+        // 0x1b: 00011011
+        b = (b<<1)^0x1b;
+      } else {
+        b <<= 1;
+      }
+      return b;
+    }
+    if (a > b) {
+      std::swap(a, b);
+    }
+    if (a&0x01) {
+      return GfPlus(GfMultiple(a - 1, b), b);
+    }
+    return GfMultiple(2, GfMultiple(a>>1, b));
+  }
+
+
+class State : public CodableInterface {
+ public:
+  explicit State(const Code& code = Code()) : value_() {
       if (code != Code()) {
         State::Decode(code);
       }
@@ -74,10 +107,14 @@ using std::array;
       }
     }
 
-    void SubBytes() {
+    void SubBytes(bool forward = true) {
       for (auto &arr : value_) {
         for (auto &b : arr) {
-          b = kForwardSBox[b/16][b%16];
+          if (forward) {
+            b = kForwardSBox[b/16][b%16];
+          } else {
+            b = kInverseSBox[b/16][b%16];
+          }
         }
       }
     }
@@ -95,16 +132,63 @@ using std::array;
       } // for i
     } // ShiftRows
 
-    void MixColumns() {
+  void MixColumns(bool forward = true) {
+      auto origin_value= value_;
+      for (int i = 0; i < 4; ++i) {
+        for (int j = 0; j < 4; ++j) {
+          Byte tmp = 0;
+          for (int k = 0; k < 4; ++k) {
+            Byte a = kForwardMatrix[i][k];
+            if (!forward) {
+              a = kInverseMatrix[i][k];
+            }
+            Byte b = origin_value[k][j];
+            tmp = GfPlus(tmp, GfMultiple(a, b));
+          }
+          value_[i][j] = tmp;
+        }
+      }
+    }
 
+
+    State RoundKey() const {
+      auto result = *this;
+      result.value_[0] = value_[0];
+      for (int i = 0; i < 4; ++i) {
+        result.value_[0][i] ^= T(value_[3])[i];
+      }
+
+      for (int i = 1; i < 4; ++i) {
+        result.value_[i] = result.value_[i - 1];
+        for (int j = 0; j < 4; ++j) {
+          result[i][j] ^= value_[i][j];
+        }
+      }
+      result.round_ = round_ + 1;
+      return result;
     }
 
    private:
+    array<Byte, 4> T(array<Byte, 4> w) const {
+      auto tmp = w[0];
+      for (int i = 0; i < 3; ++i) {
+        w[i] = w[i + 1];
+      }
+      w[3] = tmp;
+      for (int i = 0; i < 4; ++i) {
+        w[i] = kForwardSBox[w[i]/16][w[i]%16];
+      }
+      w[0] = GfPlus(w[0], kRcon[round_]);
+      return w;
+    }
+
     array<array<Byte, 4>, 4> value_;
+    int round_ = 0;
     static const Byte kForwardSBox[16][16];
     static const Byte kInverseSBox[16][16];
     static const Byte kForwardMatrix[4][4];
     static const Byte kInverseMatrix[4][4];
+    static const Byte kRcon[10];
   };
 
   const Byte State::kForwardSBox[16][16]{
@@ -125,6 +209,8 @@ using std::array;
     , 0xe1, 0xf8, 0x98, 0x11, 0x69, 0xd9, 0x8e, 0x94, 0x9b, 0x1e, 0x87, 0xe9, 0xce, 0x55, 0x28, 0xdf
     , 0x8c, 0xa1, 0x89, 0x0d, 0xbf, 0xe6, 0x42, 0x68, 0x41, 0x99, 0x2d, 0x0f, 0xb0, 0x54, 0xbb, 0x16
   };
+
+  const Byte State::kRcon[10] {0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80, 0x1b, 0x36};
 
   const Byte State::kInverseSBox[16][16] {
       0x52, 0x09, 0x6a, 0xd5, 0x30, 0x36, 0xa5, 0x38, 0xbf, 0x40, 0xa3, 0x9e, 0x81, 0xf3, 0xd7, 0xfb
@@ -158,11 +244,22 @@ using std::array;
       , 13, 9, 14, 11
       , 11, 13, 9, 14
   };
+
+  template<unsigned int N>
+  array<State, N> GenerateRoundKeys(const State& key) {
+    array<State, N> result;
+    result[0] = key.RoundKey();
+    for (int i = 1; i < N; ++i) {
+      result[i] = result[i - 1].RoundKey();
+    }
+    return result;
+  }
 }
 
   Code Aes128Encrypt(const Code& plaintext, const Code& key) {
     Code hash_key(Sha256(key).value().substr(0, 16));
     State key_state(hash_key);
+    auto round_keys = GenerateRoundKeys<10>(key_state);
 
     Code padded_text(plaintext.value()
                      + ByteString ((16 - (plaintext.value().size() % 16))
@@ -173,14 +270,44 @@ using std::array;
       Code current_text(padded_text.value().substr(i, 16));
       State text_state(current_text);
       text_state ^= key_state;
-      for (int j = 0; j < 9; ++j) {
-
+      for (int j = 0; j < 10; ++j) {
+        text_state.SubBytes();
+        text_state.ShiftRows();
+        if (j < 9) {
+          text_state.MixColumns();
+        }
+        text_state ^= round_keys[i];
       }
+      cipher_str += text_state.Encode().value();
     }
     return Code(cipher_str);
   }
 
   Code Aes128Decrypt(const Code& ciphertext, const Code& key) {
-    return Code();
+    Code hash_key(Sha256(key).value().substr(0, 16));
+    State key_state(hash_key);
+    auto round_keys = GenerateRoundKeys<10>(key_state);
+    if (ciphertext.value().size() % 16 != 0) {
+      throw DecryptError("Ciphertext size can not be divide by 128bit.");
+    }
+
+    ByteString plant_str;
+    for (int i = 0; i < ciphertext.value().size(); i += 16) {
+      Code current_text(ciphertext.value().substr(i, 16));
+      State text_state(current_text);
+      text_state ^= round_keys[9];
+      for (int j = 9; j >= 0; --j) {
+        text_state.SubBytes(false);
+        text_state.ShiftRows(false);
+        if (j > 0) {
+          text_state.MixColumns(false);
+          text_state ^= round_keys[i - 1];
+        } else {
+          text_state ^= key_state;
+        }
+      }
+      plant_str += text_state.Encode().value();
+    }
+    return Code(plant_str);
   }
 }

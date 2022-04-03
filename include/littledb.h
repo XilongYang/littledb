@@ -158,6 +158,7 @@ Code Aes128Decrypt(const Code& ciphertext, const Code& key);
 
 // Exception class using for errors form Aes128Decrypt()
 class DecryptError : public std::logic_error {
+ public:
   explicit DecryptError(const std::string &s) : std::logic_error(s) {}
 };
 
