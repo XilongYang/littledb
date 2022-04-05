@@ -126,7 +126,11 @@ class State : public CodableInterface {
           if (forward) {
             value_[i][j] = tmp[(i + j) % 4][j];
           } else {
-            value_[i][j] = tmp[(i - j) % 4][j];
+            auto tmp_index = (i - j) % 4;
+            if (tmp_index < 0) {
+              tmp_index += 4;
+            }
+            value_[i][j] = tmp[tmp_index][j];
           }
         } // for j
       } // for i
@@ -291,23 +295,21 @@ class State : public CodableInterface {
       throw DecryptError("Ciphertext size can not be divide by 128bit.");
     }
 
-    ByteString plant_str;
+    ByteString plain_str;
     for (int i = 0; i < ciphertext.value().size(); i += 16) {
       Code current_text(ciphertext.value().substr(i, 16));
       State text_state(current_text);
-      text_state ^= round_keys[9];
       for (int j = 9; j >= 0; --j) {
-        text_state.SubBytes(false);
-        text_state.ShiftRows(false);
-        if (j > 0) {
+        text_state ^= round_keys[i];
+        if (j < 9) {
           text_state.MixColumns(false);
-          text_state ^= round_keys[i - 1];
-        } else {
-          text_state ^= key_state;
         }
+        text_state.ShiftRows(false);
+        text_state.SubBytes(false);
       }
-      plant_str += text_state.Encode().value();
+      text_state ^= key_state;
+      plain_str += text_state.Encode().value();
     }
-    return Code(plant_str);
+    return Code(plain_str);
   }
 }

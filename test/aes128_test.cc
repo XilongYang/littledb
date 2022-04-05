@@ -80,6 +80,9 @@ TEST(State, Xor) {
 
   state1 ^= state2;
   EXPECT_EQ(state1, xor_state);
+
+  state1 ^= state2;
+  EXPECT_EQ(State(code1), state1);
 }
 
 TEST(State, SubBytes) {
@@ -96,6 +99,9 @@ TEST(State, SubBytes) {
   State state((Code(origin)));
   state.SubBytes();
   EXPECT_EQ(state.Encode().value(), except);
+
+  state.SubBytes(false);
+  EXPECT_EQ(state.Encode().value(), origin);
 }
 
 TEST(State, ShiftRows) {
@@ -112,6 +118,9 @@ TEST(State, ShiftRows) {
   State state((Code(origin)));
   state.ShiftRows();
   EXPECT_EQ(state.Encode().value(), except);
+
+  state.ShiftRows(false);
+  EXPECT_EQ(state.Encode().value(), origin);
 }
 
 TEST(State, MixColumns) {
@@ -128,6 +137,9 @@ TEST(State, MixColumns) {
   State state((Code(origin)));
   state.MixColumns();
   EXPECT_EQ(state.Encode().value(), except);
+
+  state.MixColumns(false);
+  EXPECT_EQ(state.Encode().value(), origin);
 }
 
 TEST(State, RoundKey) {
@@ -178,7 +190,12 @@ TEST(Aes128, EncryptAndDecrypt) {
 
   Code ciphertext = Aes128Encrypt(plaintext, key);
 
-  Code decrypt_text = Aes128Decrypt(ciphertext, key);
+  auto decrypt_bytes = Aes128Decrypt(ciphertext, key).value();
+  while (decrypt_bytes.back() == 0) {
+    decrypt_bytes.pop_back();
+  }
+
+  Code decrypt_text(decrypt_bytes);
 
   EXPECT_EQ(plaintext.HexValue(), decrypt_text.HexValue());
 }
