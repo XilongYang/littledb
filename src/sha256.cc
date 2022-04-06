@@ -1,14 +1,14 @@
 // Created by Xilong Yang on 2022-03-11.
 //
 
-#include "littledb.h"
+#include "little_crypt.h"
 
 #include <array>
 #include <cstdint>
 
 using std::array;
 
-namespace littledb{
+namespace little_crypt {
 namespace {
   // 8 initialized values of hash function.
   const array<uint32_t, 8> kHashInit =
@@ -155,4 +155,4 @@ namespace {
     } // for chunk_count
     return HashCombine(hash);
   } // Sha256
-}  // namespace littledb
+}  // namespace little_crypt

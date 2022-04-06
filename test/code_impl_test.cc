@@ -5,7 +5,7 @@
 
 #include <gtest/gtest.h>
 
-using namespace littledb;
+using namespace little_crypt;
 
 TEST(ByteString, ToByteString) {
   ByteString str1{'H', 'e', 'l', 'l', 'o'};
@@ -28,7 +28,7 @@ TEST(Code, CodeConstruct) {
 }
 
 TEST(Code, CopyAndMove) {
-  Code code(littledb::ToByteString("Test"));
+  Code code(little_crypt::ToByteString("Test"));
 
   auto code1 = code;
   EXPECT_EQ(code.value(), code1.value());

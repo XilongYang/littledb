@@ -8,7 +8,7 @@
 #include <stdexcept>
 #include <string>
 
-namespace littledb{
+namespace little_crypt {
 // Using the 8bit unsigned int for Byte type.
 using Byte = uint8_t;
 
@@ -162,6 +162,6 @@ class DecryptError : public std::logic_error {
   explicit DecryptError(const std::string &s) : std::logic_error(s) {}
 };
 
-}  // namespace littledb
+}  // namespace little_crypt
 
 #endif  // LITTLEDB_H

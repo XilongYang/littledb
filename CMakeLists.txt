@@ -7,7 +7,7 @@ include_directories(include)
 include_directories(src)
 
 add_library(little_crypt
-        include/littledb.h
+        include/little_crypt.h
         src/code_impl.cc
         src/sha256.cc
         src/hmac.cc

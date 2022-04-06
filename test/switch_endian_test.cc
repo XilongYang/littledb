@@ -1,11 +1,11 @@
 // Created by Xilong Yang on 2022-03-19.
 //
 
-#include "littledb.h"
+#include "little_crypt.h"
 
 #include <gtest/gtest.h>
 
-using namespace littledb;
+using namespace little_crypt;
 
 TEST(SwitchEndian, SwitchEndian) {
   constexpr uint16_t test = 0x1234;

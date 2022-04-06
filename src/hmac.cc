@@ -1,10 +1,9 @@
 // Created by Xilong Yang on 2022-03-20.
 //
 
-#include "littledb.h"
+#include "little_crypt.h"
 
-
-namespace littledb {
+namespace little_crypt {
 namespace {
   Code XOR(const Code& code, uint8_t pad) {
     auto str = code.value();

@@ -1,3 +1,3 @@
-# LittleDB 
+# Little Crypt
 
-A simple k-v database.
+A simple library provides some encrypt/decrypt concerned function such as SHA, HMAC and AES.

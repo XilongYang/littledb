@@ -5,7 +5,7 @@
 
 #include <gtest/gtest.h>
 
-using namespace littledb;
+using namespace little_crypt;
 
 TEST(GF, GfMultiple) {
     int a = GfPlus(

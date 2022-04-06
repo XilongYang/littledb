@@ -1,9 +1,9 @@
 // Created by Xilong Yang on 2022-03-11.
 //
 
-#include "littledb.h"
+#include "little_crypt.h"
 
-namespace littledb{
+namespace little_crypt {
 ByteString ToByteString(const std::string& str) {
   ByteString result(str.size(), 0);
   for (int i = 0; i < str.size(); ++i) {
@@ -56,4 +56,4 @@ Code& Code::operator+=(const Code& code) {
   return *this;
 }
 
-}  // namespace littledb
+}  // namespace little_crypt

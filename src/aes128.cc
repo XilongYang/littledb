@@ -1,12 +1,12 @@
 // Created by Xilong Yang on 2022-03-20.
 //
 
-#include "littledb.h"
+#include "little_crypt.h"
 
 #include <array>
 #include <stdexcept>
 
-namespace littledb{
+namespace little_crypt {
 namespace {
 using std::array;
 
