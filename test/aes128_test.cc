@@ -100,7 +100,7 @@ TEST(State, SubBytes) {
   state.SubBytes();
   EXPECT_EQ(state.Encode().value(), except);
 
-  state.SubBytes(false);
+  state.SubBytes(little_crypt::State::INVERT);
   EXPECT_EQ(state.Encode().value(), origin);
 }
 
@@ -119,7 +119,7 @@ TEST(State, ShiftRows) {
   state.ShiftRows();
   EXPECT_EQ(state.Encode().value(), except);
 
-  state.ShiftRows(false);
+  state.ShiftRows(little_crypt::State::INVERT);
   EXPECT_EQ(state.Encode().value(), origin);
 }
 
@@ -138,7 +138,7 @@ TEST(State, MixColumns) {
   state.MixColumns();
   EXPECT_EQ(state.Encode().value(), except);
 
-  state.MixColumns(false);
+  state.MixColumns(little_crypt::State::INVERT);
   EXPECT_EQ(state.Encode().value(), origin);
 }
 

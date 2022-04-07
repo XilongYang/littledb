@@ -45,6 +45,8 @@ using std::array;
 
 class State : public CodableInterface {
  public:
+  enum Direction{FORWARD, INVERT};
+
   explicit State(const Code& code = Code()) : value_() {
       if (code != Code()) {
         State::Decode(code);
@@ -107,10 +109,10 @@ class State : public CodableInterface {
       }
     }
 
-    void SubBytes(bool forward = true) {
+    void SubBytes(Direction d = FORWARD) {
       for (auto &arr : value_) {
         for (auto &b : arr) {
-          if (forward) {
+          if (d == FORWARD) {
             b = kForwardSBox[b/16][b%16];
           } else {
             b = kInverseSBox[b/16][b%16];
@@ -119,11 +121,11 @@ class State : public CodableInterface {
       }
     }
 
-    void ShiftRows(bool forward = true) {
+    void ShiftRows(Direction d = FORWARD) {
       auto tmp = value_;
       for (int i = 0; i < 4; ++i) {
         for (int j = 1; j < 4; ++j) {
-          if (forward) {
+          if (d == FORWARD) {
             value_[i][j] = tmp[(i + j) % 4][j];
           } else {
             auto tmp_index = (i - j) % 4;
@@ -136,14 +138,14 @@ class State : public CodableInterface {
       } // for i
     } // ShiftRows
 
-  void MixColumns(bool forward = true) {
+  void MixColumns(Direction d = FORWARD) {
       auto origin_value= value_;
       for (int i = 0; i < 4; ++i) {
         for (int j = 0; j < 4; ++j) {
           Byte tmp = 0;
           for (int k = 0; k < 4; ++k) {
             Byte a = kForwardMatrix[i][k];
-            if (!forward) {
+            if (d == INVERT) {
               a = kInverseMatrix[i][k];
             }
             Byte b = origin_value[k][j];
@@ -302,10 +304,10 @@ class State : public CodableInterface {
       for (int j = 9; j >= 0; --j) {
         text_state ^= round_keys[i];
         if (j < 9) {
-          text_state.MixColumns(false);
+          text_state.MixColumns(State::INVERT);
         }
-        text_state.ShiftRows(false);
-        text_state.SubBytes(false);
+        text_state.ShiftRows(State::INVERT);
+        text_state.SubBytes(State::INVERT);
       }
       text_state ^= key_state;
       plain_str += text_state.Encode().value();
