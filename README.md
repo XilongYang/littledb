@@ -29,7 +29,7 @@ cd build/test
 
 ## Usage
 
-This project is a static library. So you can use it with simply copy the `include\little_crypt.h` to you project include 
+This project is a static library. So you can use it by simply copy the `include\little_crypt.h` to you project include 
 path and link the `liblittle_crypt.a` to you project.
 
 For example:
