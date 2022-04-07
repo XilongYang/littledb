@@ -4,10 +4,10 @@
 #include "little_crypt.h"
 
 #include <gtest/gtest.h>
-#include <sstream>
 #include <iostream>
 
-using namespace little_crypt;
+using little_crypt::ByteString;
+using little_crypt::ToByteString;
 
 TEST(ByteString, ToByteString) {
 ByteString str1{'H', 'e', 'l', 'l', 'o'};

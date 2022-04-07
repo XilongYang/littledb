@@ -25,9 +25,9 @@ ByteString ToByteString(const char* c_ptr, size_t size);
 
 
 // The class provides a type which can be used by crypt functions.
-// The class can be constructed with std::string.
-// The class supports copy and move operations.
-// Use code.value() to get a std::string.
+// It can be constructed with ByteString.
+// It supports copy and move operations.
+// Use code.value() to get a ByteString.
 // Use + operator to connect 2 or more Codes.
 // Use Code::BaseToCode() to convert base type to code.
 class Code {
@@ -87,7 +87,7 @@ class DecodeError : public std::logic_error {
   explicit DecodeError(const std::string& s) : std::logic_error(s) {}
 };
 
-// The following functions provides switch between small endian and big endian.
+// The following functions provides switch between little endian and big endian.
 
 // Judge if the system is big endian.
 inline bool SystemIsBigEndian() {
@@ -96,7 +96,7 @@ inline bool SystemIsBigEndian() {
   return first == 0x12;
 }
 
-// Switch between small endian and big endian.
+// Switch between little endian and big endian.
 template<typename T>
 T SwitchEndian(const T& input) {
   T output(0);
@@ -117,9 +117,9 @@ T BigEndian(const T& input) {
   return SwitchEndian(input);
 }
 
-// Take the small endian representation of a value.
+// Take the little endian representation of a value.
 template<typename T>
-T SmallEndian(const T& input) {
+T LittleEndian(const T& input) {
   if (SystemIsBigEndian()) {
     return SwitchEndian(input);
   }

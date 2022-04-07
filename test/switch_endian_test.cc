@@ -21,12 +21,12 @@ TEST(SwitchEndian, BigEndian) {
   }
 }
 
-TEST(SwitchEndian, SmallEndian) {
+TEST(SwitchEndian, LittleEndian) {
   constexpr uint16_t test = 0x1234;
   if (SystemIsBigEndian()) {
-    EXPECT_EQ(SmallEndian(test), SwitchEndian(test));
+    EXPECT_EQ(LittleEndian(test), SwitchEndian(test));
   } else {
-    EXPECT_EQ(SmallEndian(test), test);
+    EXPECT_EQ(LittleEndian(test), test);
   }
 }
 
