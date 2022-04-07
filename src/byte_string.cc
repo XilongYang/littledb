@@ -21,20 +21,22 @@ ByteString ToByteString(const char* c_ptr, size_t size) {
   }
   return result;
 }
+}
 
-std::ostream& operator<<(std::ostream& os, const ByteString& byte_str) {
+std::ostream& operator<<(std::ostream& os
+                         , const little_crypt::ByteString& byte_str) {
   for (auto b : byte_str) {
     os << b;
   }
   return os;
 }
 
-std::istream& operator>>(std::istream& is, ByteString& byte_str) {
-  std::istream_iterator<Byte> iter(is);
-  std::istream_iterator<Byte> eof;
+std::istream& operator>>(std::istream& is
+                         , little_crypt::ByteString& byte_str) {
+  std::istream_iterator<little_crypt::Byte> iter(is);
+  std::istream_iterator<little_crypt::Byte> eof;
   while (iter != eof){
     byte_str.push_back(*iter++);
   }
   return is;
-}
 }

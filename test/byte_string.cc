@@ -5,6 +5,7 @@
 
 #include <gtest/gtest.h>
 #include <sstream>
+#include <iostream>
 
 using namespace little_crypt;
 
@@ -27,4 +28,6 @@ TEST(ByteString, IO) {
   ByteString str1;
   in >> str1;
   EXPECT_EQ(str1, str);
+
+  std::cout << str << std::endl;
 }

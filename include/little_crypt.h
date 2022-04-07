@@ -23,9 +23,6 @@ using ByteString = std::basic_string<Byte>;
 ByteString ToByteString(const std::string& str);
 ByteString ToByteString(const char* c_ptr, size_t size);
 
-// I/O for ByteString.
-std::ostream& operator<<(std::ostream& os, const ByteString& byte_str);
-std::istream& operator>>(std::istream& is, ByteString& byte_str);
 
 // The class provides a type which can be used by crypt functions.
 // The class can be constructed with std::string.
@@ -169,5 +166,12 @@ class DecryptError : public std::logic_error {
 };
 
 }  // namespace little_crypt
+
+// I/O for ByteString.
+std::ostream& operator<<(std::ostream& os
+                         , const little_crypt::ByteString& byte_str);
+
+std::istream& operator>>(std::istream& is
+                         , little_crypt::ByteString& byte_str);
 
 #endif  // LITTLEDB_H
