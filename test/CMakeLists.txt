@@ -14,6 +14,7 @@ add_executable(all_test
         sha256_test.cc
         hmac_test.cc
         aes128_test.cc
+        byte_string.cc
         )
 
 target_link_libraries(all_test

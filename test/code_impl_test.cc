@@ -7,14 +7,6 @@
 
 using namespace little_crypt;
 
-TEST(ByteString, ToByteString) {
-  ByteString str1{'H', 'e', 'l', 'l', 'o'};
-  auto str2 = ToByteString("Hello");
-  auto str3 = ToByteString("Hello", 5);
-
-  EXPECT_EQ(str1, str2);
-  EXPECT_EQ(str1, str3);
-}
 
 TEST(Code, CodeConstruct) {
   Code code;

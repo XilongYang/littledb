@@ -4,22 +4,6 @@
 #include "little_crypt.h"
 
 namespace little_crypt {
-ByteString ToByteString(const std::string& str) {
-  ByteString result(str.size(), 0);
-  for (int i = 0; i < str.size(); ++i) {
-    result[i] = str[i];
-  }
-  return result;
-}
-
-ByteString ToByteString(const char* c_ptr, size_t size) {
-  ByteString result(size, 0);
-  for (int i = 0; i < size; ++i) {
-    result[i] = c_ptr[i];
-  }
-  return result;
-}
-
 Code::Code(const ByteString& value) {
   value_ = value;
 }
@@ -55,5 +39,4 @@ Code& Code::operator+=(const Code& code) {
   *this = *this + code;
   return *this;
 }
-
 }  // namespace little_crypt

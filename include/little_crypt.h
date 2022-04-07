@@ -7,19 +7,25 @@
 #include <functional>
 #include <stdexcept>
 #include <string>
+#include <iostream>
 
 namespace little_crypt {
+// Using std::size_t as our size type.
+using std::size_t;
+
 // Using the 8bit unsigned int for Byte type.
 using Byte = uint8_t;
 
 // Using the string which contains 8bit unsigned int for ByteString type.
 using ByteString = std::basic_string<Byte>;
 
-// Using std::size_t as our size type.
-using std::size_t;
-
+// Convert std::string and C style string to ByteString.
 ByteString ToByteString(const std::string& str);
 ByteString ToByteString(const char* c_ptr, size_t size);
+
+// I/O for ByteString.
+std::ostream& operator<<(std::ostream& os, const ByteString& byte_str);
+std::istream& operator>>(std::istream& is, ByteString& byte_str);
 
 // The class provides a type which can be used by crypt functions.
 // The class can be constructed with std::string.
