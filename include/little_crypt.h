@@ -1,8 +1,8 @@
 // Created by Xilong Yang on 2022-03-11.
 //
 
-#ifndef LITTLEDB_H
-#define LITTLEDB_H
+#ifndef LITTLE_CRYPT_H
+#define LITTLE_CRYPT_H
 
 #include <functional>
 #include <stdexcept>
@@ -174,4 +174,4 @@ std::ostream& operator<<(std::ostream& os
 std::istream& operator>>(std::istream& is
                          , little_crypt::ByteString& byte_str);
 
-#endif  // LITTLEDB_H
+#endif  // LITTLE_CRYPT_H
