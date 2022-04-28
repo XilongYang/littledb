@@ -5,7 +5,7 @@
 
 #include <gtest/gtest.h>
 
-using namespace little_crypt;
+using namespace littledb;
 using std::array;
 
 TEST(Sha256, Preprocess) {

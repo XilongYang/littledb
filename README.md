@@ -1,10 +1,10 @@
 # Little Crypt
 
-![license](https://img.shields.io/github/license/XilongYang/little_crypt)
+![license](https://img.shields.io/github/license/XilongYang/littledb)
 ![cmake](https://img.shields.io/badge/CMake%20Version-%3E%3D3.16-green)
 ![cpp](https://img.shields.io/badge/C%2B%2B%20Version-17-green)
 ![gtest](https://img.shields.io/badge/Googletest-v1.10-green)
-![build](https://img.shields.io/github/workflow/status/XilongYang/little_crypt/CMake)
+![build](https://img.shields.io/github/workflow/status/XilongYang/littledb/CMake)
 
 A simple C++ library provides some encrypt/decrypt concerned interfaces and functions such as SHA, HMAC and AES.
 
@@ -13,8 +13,8 @@ A simple C++ library provides some encrypt/decrypt concerned interfaces and func
 Just do this, make sure you had installed the Googletest library:
 
 ```bash
-git clone https://github.com/XilongYang/little_crypt.git
-cd little_crypt
+git clone https://github.com/XilongYang/littledb.git
+cd littledb
 mkdir -p build && cd build
 cmake .. .
 make
@@ -29,7 +29,7 @@ cd build/test
 
 ## Usage
 
-This project is a static library. So you can use it by simply copy the `include\little_crypt.h` to you project include 
+This project is a static library. So you can use it by simply copy the `include\littledb.h` to you project include 
 path and link the `liblittle_crypt.a` to you project.
 
 For example:
@@ -39,21 +39,21 @@ For example:
 //├── main.cc
 //└── third_party
 //    ├── include
-//    │   └── little_crypt.h
+//    │   └── littledb.h
 //    └── lib
 //        └── liblittle_crypt.a
 
 //main.cc
 
-#include "third_party/include/little_crypt.h"
+#include "third_party/include/littledb.h"
 #include <iostream>
 
 int main() {
-    little_crypt::ByteString str(little_crypt::ToByteString("Hello"));
+    littledb::ByteString str(littledb::ToByteString("Hello"));
     std::cout << str << std::endl;
 
-    little_crypt::Code code(str);
-    code = little_crypt::Sha256(code);
+    littledb::Code code(str);
+    code = littledb::Sha256(code);
 
     std::cout << code.HexValue() << std::endl;
     return 0;

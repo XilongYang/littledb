@@ -1,13 +1,13 @@
 // Created by Xilong Yang on 2022-04-07.
 //
 
-#include "little_crypt.h"
+#include "littledb.h"
 
 #include <gtest/gtest.h>
 #include <iostream>
 
-using little_crypt::ByteString;
-using little_crypt::ToByteString;
+using littledb::ByteString;
+using littledb::ToByteString;
 
 TEST(ByteString, ToByteString) {
 ByteString str1{'H', 'e', 'l', 'l', 'o'};

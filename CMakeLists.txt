@@ -1,19 +1,23 @@
 cmake_minimum_required(VERSION 3.16)
-project(little_crypt)
+project(littledb)
 
 set(CMAKE_CXX_STANDARD 17)
 
 include_directories(include)
-include_directories(src)
+include_directories(crypt)
+include_directories(db)
+include_directories(third_party)
 
-add_library(little_crypt
-        include/little_crypt.h
-        src/byte_string.cc
-        src/code_impl.cc
-        src/sha256.cc
-        src/hmac.cc
-        src/aes128.cc
-        )
+add_library(littledb
+        include/littledb.h
+        crypt/byte_string.cc
+        crypt/code_impl.cc
+        crypt/sha256.cc
+        crypt/hmac.cc
+        crypt/aes128.cc
+        crypt/rsa1024.cc
+        db/mempool.cc
+        db/mempool.h db/skip_list.cc db/skip_list.h db/inner_key.cc db/inner_key.h)
 
 enable_testing()
 add_subdirectory(test)

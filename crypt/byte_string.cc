@@ -1,11 +1,11 @@
 // Created by Xilong Yang on 2022-04-07.
 //
 
-#include "little_crypt.h"
+#include "littledb.h"
 
 #include <iterator>
 
-namespace little_crypt{
+namespace littledb {
 ByteString ToByteString(const std::string& str) {
   ByteString result(str.size(), 0);
   for (int i = 0; i < str.size(); ++i) {
@@ -24,7 +24,7 @@ ByteString ToByteString(const char* c_ptr, size_t size) {
 }
 
 std::ostream& operator<<(std::ostream& os
-                         , const little_crypt::ByteString& byte_str) {
+                         , const littledb::ByteString& byte_str) {
   for (auto b : byte_str) {
     os << b;
   }
@@ -32,9 +32,9 @@ std::ostream& operator<<(std::ostream& os
 }
 
 std::istream& operator>>(std::istream& is
-                         , little_crypt::ByteString& byte_str) {
-  std::istream_iterator<little_crypt::Byte> iter(is);
-  std::istream_iterator<little_crypt::Byte> eof;
+                         , littledb::ByteString& byte_str) {
+  std::istream_iterator<littledb::Byte> iter(is);
+  std::istream_iterator<littledb::Byte> eof;
   while (iter != eof){
     byte_str.push_back(*iter++);
   }

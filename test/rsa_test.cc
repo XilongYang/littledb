@@ -15,21 +15,18 @@ TEST(RSA, RsaInt) {
   EXPECT_EQ(x.Encode().HexValue(), code.HexValue());
 }
 
-TEST(RSA, RSA1024) {
-  auto public_e= Code::FromHex(ToByteString("07"));
-  auto private_e = Code::FromHex(ToByteString("03"));
-  auto n = Code::FromHex(ToByteString("21"));
-
-  RsaInt x("23");
-
-  auto cipher = RSA1024(x.Encode(), public_e, n);
-  auto plain = RSA1024(cipher, private_e, n);
-
-  RsaInt result;
-  result.Decode(plain);
-  EXPECT_EQ(result.to_string(), x.to_string());
-
-  RsaInt y("59");
-  EXPECT_THROW(RSA1024(y.Encode(), public_e, n), std::logic_error);
-}
+//TEST(RSA, RSA1024) {
+//  auto n_code = Code::FromHex(ToByteString("7db9fa70cd"));
+//  auto pub_e_code = Code::FromHex(ToByteString("010001"));
+//  auto pri_e_code = Code::FromHex(ToByteString("79629895aa"));
+//
+//  RsaInt x("709394");
+//
+//  auto cipher = RSA1024(x.Encode(), pub_e_code, n_code);
+//  auto plain = RSA1024(cipher, pri_e_code, n_code);
+//
+//  RsaInt result;
+//  result.Decode(plain);
+//  EXPECT_EQ(result.to_string(), x.to_string());
+//}
 

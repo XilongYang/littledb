@@ -5,8 +5,7 @@
 
 #include <gtest/gtest.h>
 
-using namespace little_crypt;
-
+using namespace littledb;
 
 TEST(Code, CodeConstruct) {
   Code code;
@@ -20,7 +19,7 @@ TEST(Code, CodeConstruct) {
 }
 
 TEST(Code, CopyAndMove) {
-  Code code(little_crypt::ToByteString("Test"));
+  Code code(littledb::ToByteString("Test"));
 
   auto code1 = code;
   EXPECT_EQ(code.value(), code1.value());
@@ -33,6 +32,11 @@ TEST(Code, CopyAndMove) {
 
   auto code4 = std::move(code3);
   EXPECT_EQ(code2.value(), code4.value());
+}
+
+TEST(Code, HexToCode) {
+  Code code(ToByteString("Hello"));
+  EXPECT_EQ(code.HexValue(), Code::FromHex(code.HexValue()).HexValue());
 }
 
 TEST(Code, HexValue) {

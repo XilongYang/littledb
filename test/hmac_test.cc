@@ -2,11 +2,11 @@
 //
 
 
-#include "little_crypt.h"
+#include "littledb.h"
 
 #include <gtest/gtest.h>
 
-using namespace little_crypt;
+using namespace littledb;
 
 TEST(Hmac, HmacSha256) {
   Code msg(ToByteString("HelloWorld"));

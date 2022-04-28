@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(little_crypt)
+project(littledb)
 
 find_package(GTest REQUIRED)
 include_directories(${GTEST_INCLUDE_DIRS})
@@ -15,10 +15,10 @@ add_executable(all_test
         hmac_test.cc
         aes128_test.cc
         byte_string.cc
-        )
+        rsa_test.cc)
 
 target_link_libraries(all_test
-        little_crypt
+        littledb
         ${GTEST_BOTH_LIBRARIES}
         pthread)
 

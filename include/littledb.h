@@ -1,15 +1,15 @@
 // Created by Xilong Yang on 2022-03-11.
 //
 
-#ifndef LITTLE_CRYPT_H
-#define LITTLE_CRYPT_H
+#ifndef LITTLEDB_H
+#define LITTLEDB_H
 
 #include <functional>
 #include <stdexcept>
 #include <string>
 #include <iostream>
 
-namespace little_crypt {
+namespace littledb {
 // Using std::size_t as our size type.
 using std::size_t;
 
@@ -46,7 +46,6 @@ class Code {
 
   // Append 'code' to the end of the object.
   const Code operator+(const Code& code) const;
-
   Code& operator+=(const Code& code);
 
   // The function provides a transform from inner types to Code.
@@ -68,6 +67,9 @@ class Code {
     return Code(result);
   }
 
+  // Get the code for a hexadecimal number.
+  static Code FromHex(const ByteString& hex);
+
  private:
   ByteString value_;
 };  // class Code
@@ -82,6 +84,7 @@ class CodableInterface {
 };
 
 // Exception class using for errors from CodableInterface.Decode()
+// or Code::FromDec() or Code::FromHex()
 class DecodeError : public std::logic_error {
  public:
   explicit DecodeError(const std::string& s) : std::logic_error(s) {}
@@ -159,19 +162,26 @@ Code Aes128Encrypt(const Code& plaintext, const Code& key);
 // an exception.
 Code Aes128Decrypt(const Code& ciphertext, const Code& key);
 
-// Exception class using for errors form Aes128Decrypt()
+// Take the RSA processed text for a pair of a text and key using RSA algorithm.
+// If the text length is less than 1024bit, it will be padded with
+// 0 at the beginning till the length is divisible by 1024.
+// If the text length is bigger than 1024bit, the function will throw an
+// exception.
+Code Rsa1024(const Code& text, const Code& exponent, const Code& modulus);
+
+// Exception class using for errors form Aes128Decrypt().
 class DecryptError : public std::logic_error {
  public:
   explicit DecryptError(const std::string &s) : std::logic_error(s) {}
 };
 
-}  // namespace little_crypt
+}  // namespace littledb
 
 // I/O for ByteString.
 std::ostream& operator<<(std::ostream& os
-                         , const little_crypt::ByteString& byte_str);
+                         , const littledb::ByteString& byte_str);
 
 std::istream& operator>>(std::istream& is
-                         , little_crypt::ByteString& byte_str);
+                         , littledb::ByteString& byte_str);
 
-#endif  // LITTLE_CRYPT_H
+#endif  // LITTLEDB_H

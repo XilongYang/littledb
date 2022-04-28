@@ -1,0 +1,35 @@
+@startuml class
+skinparam Monochrome true
+
+
+class Byte
+class ByteString {
+    +ToByteString()
+}
+
+ByteString *- Byte
+
+class Code {
+    +Code(ByteString)
+    +BaseToCode()
+    value_:ByteString
+}
+
+Code ..> ByteString
+
+interface CodableInterface {
+    Code Encode()
+    void Decode(Code)
+}
+
+CodableInterface -> Code
+
+entity EndianFunctions {
+    +SystemIsBigEndian()
+    +SwitchEndian()
+    +BigEndian()
+    +LittleEndian()
+    +LocalEndian()
+}
+
+@enduml
