@@ -16,14 +16,14 @@ class InnerKey : public CodableInterface{
   Code Encode() override;
   void Decode(const Code& code) override;
 
-  bool operator==(const InnerKey& other);
-  bool operator!=(const InnerKey& other);
+  bool operator==(const InnerKey& other) const;
+  bool operator!=(const InnerKey& other) const;
 
-  bool operator<(const InnerKey& other);
-  bool operator>(const InnerKey& other);
+  bool operator<(const InnerKey& other) const;
+  bool operator>(const InnerKey& other) const;
 
-  bool operator<=(const InnerKey& other);
-  bool operator>=(const InnerKey& other);
+  bool operator<=(const InnerKey& other) const;
+  bool operator>=(const InnerKey& other) const;
  private:
   uint64_t key_part1_;
   uint64_t key_part2_;

@@ -33,4 +33,28 @@ void InnerKey::Decode(const Code& code) {
     part2_ptr[i] = code.value()[i + 8];
   }
 }
+
+bool InnerKey::operator==(const InnerKey& other) const {
+  return key_part1_ == other.key_part1_ && key_part2_ == other.key_part2_;
+}
+
+bool InnerKey::operator!=(const InnerKey& other) const {
+  return !(other == *this);
+}
+
+bool InnerKey::operator<(const InnerKey& other) const {
+  return key_part1_ < other.key_part1_ || key_part2_ < other.key_part2_;
+}
+
+bool InnerKey::operator>(const InnerKey& other) const {
+  return key_part1_ > other.key_part1_ || key_part2_ > other.key_part2_;
+}
+
+bool InnerKey::operator<=(const InnerKey& other) const {
+  return *this < other || *this == other;
+}
+
+bool InnerKey::operator>=(const InnerKey& other) const {
+  return *this > other || *this == other;
+}
 }

@@ -112,7 +112,7 @@ class BigInt {
         long to_long() const;
         long long to_long_long() const;
 
-        // Random number generating functions:
+        // RandomGenerator number generating functions:
         friend BigInt big_random(size_t);
 };
 
@@ -236,7 +236,7 @@ bool is_power_of_10(const std::string& num){
 
 /*
     ===========================================================================
-    Random number generating functions for BigInt
+    RandomGenerator number generating functions for BigInt
     ===========================================================================
 */
 
@@ -247,7 +247,7 @@ bool is_power_of_10(const std::string& num){
 #include <climits>
 
 
-// when the number of digits are not specified, a random value is used for it
+// when the number of digits are not specified, a RandomGenerator value is used for it
 // which is kept below the following:
 const size_t MAX_RANDOM_LENGTH = 1000;
 
@@ -255,14 +255,14 @@ const size_t MAX_RANDOM_LENGTH = 1000;
 /*
     big_random (num_digits)
     -----------------------
-    Returns a random BigInt with a specific number of digits.
+    Returns a RandomGenerator BigInt with a specific number of digits.
 */
 
 BigInt big_random(size_t num_digits = 0) {
-    std::random_device rand_generator;      // true random number generator
+    std::random_device rand_generator;      // true RandomGenerator number generator
 
     if (num_digits == 0)    // the number of digits were not specified
-        // use a random number for it:
+        // use a RandomGenerator number for it:
         num_digits = 1 + rand_generator() % MAX_RANDOM_LENGTH;
 
     BigInt big_rand;
