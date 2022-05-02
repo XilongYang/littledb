@@ -45,7 +45,7 @@ class SkipList::Iterator{
 
   const InnerKey& Key() const;
 
-  const Code& Value() const;
+  Code Value() const;
 
   void Next();
 

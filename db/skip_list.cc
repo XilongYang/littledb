@@ -125,7 +125,7 @@ const InnerKey& SkipList::Iterator::Key() const {
   return node_->key_;
 }
 
-const Code& SkipList::Iterator::Value() const {
+Code SkipList::Iterator::Value() const {
   if (!Valid()) {
     throw std::runtime_error("Iterator not valid");
   }

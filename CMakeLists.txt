@@ -17,7 +17,14 @@ add_library(littledb
         crypt/aes128.cc
         crypt/rsa1024.cc
         db/mempool.cc
-        db/mempool.h db/skip_list.cc db/skip_list.h db/inner_key.cc db/inner_key.h)
+        db/mempool.h
+        db/skip_list.cc
+        db/skip_list.h
+        db/inner_key.cc
+        db/inner_key.h
+        db/memtable.cc
+        db/memtable.h)
 
 enable_testing()
-add_subdirectory(test)
+add_subdirectory(crypt/test)
+add_subdirectory(db/test)
