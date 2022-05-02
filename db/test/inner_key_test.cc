@@ -4,7 +4,7 @@
 
 #include <gtest/gtest.h>
 
-#include "inner_key.cc"
+#include "inner_key.h"
 
 using namespace littledb;
 

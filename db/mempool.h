@@ -9,6 +9,8 @@
 namespace littledb{
 class MemPool {
  public:
+  static constexpr size_t kBlockSize = 4096;
+
   MemPool();
   ~MemPool();
 
@@ -18,13 +20,14 @@ class MemPool {
   char* Allocate(size_t bytes);
 
   size_t UsageBytes() const;
+
+  size_t AllocatedBytes() const;
  private:
   char* allocate_ptr_;
-  size_t used_bytes_;
   size_t allocated_bytes_;
+  size_t remain_bytes_;
   std::vector<char*> pool_;
 
-  static size_t kBlockSize;
 };
 }
 

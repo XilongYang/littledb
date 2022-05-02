@@ -15,8 +15,8 @@ size_t SkipList::GetMaxHeight() {
 }
 
 size_t SkipList::RandomLevel() {
-  std::default_random_engine e(time(0));
-  std::bernoulli_distribution b(0.5);
+  static std::default_random_engine e(time(0));
+  static std::bernoulli_distribution b(0.5);
   size_t level = 1;
   for (int i = 0; i < kMaxHeight; ++i) {
     if (b(e) || level == kMaxHeight) {
@@ -28,8 +28,8 @@ size_t SkipList::RandomLevel() {
 }
 
 SkipList::SkipList(MemPool* mem_pool)
-    : head_(NewNode(InnerKey(), kMaxHeight))
-    , mem_pool_(mem_pool) {}
+    : mem_pool_(mem_pool)
+      , head_(NewNode(InnerKey(), kMaxHeight)) {}
 
 void SkipList::Insert(const InnerKey &key, const Code &value) {
   auto prev = FindLessThan(key);
@@ -42,10 +42,10 @@ void SkipList::Insert(const InnerKey &key, const Code &value) {
 
 Code SkipList::Get(const InnerKey &key) {
   auto x = FindGreaterOrEqual(key);
-  if (x->key_ == key) {
+  if (x != nullptr && x != head_ && x->key_ == key) {
     return x->GetValue();
   }
-  return Code();
+  throw NotFoundError();
 }
 
 SkipList::Node*
@@ -102,8 +102,11 @@ SkipList::NewNode(const InnerKey &key, size_t height, const Code value) {
   auto const next_mem = reinterpret_cast<Node**>(
       mem_pool_->Allocate(sizeof(SkipList::Node*) * height));
   auto const value_length = value.value().size();
-  auto const value_mem = reinterpret_cast<Byte*>(
-      mem_pool_->Allocate(value_length));
+  Byte* value_mem = nullptr;
+  if (value_length != 0) {
+    value_mem = reinterpret_cast<Byte*>(
+        mem_pool_->Allocate(value_length));
+  }
   for (auto i = 0; i < value_length; ++i) {
     value_mem[i] = value.value()[i];
   }

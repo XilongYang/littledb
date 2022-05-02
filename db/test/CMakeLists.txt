@@ -10,7 +10,9 @@ enable_testing()
 
 add_executable(db_test
         inner_key_test.cc
-        )
+        mempool_test.cc
+        skip_list_test.cc
+        memtable_test.cc)
 
 target_link_libraries(db_test
         littledb

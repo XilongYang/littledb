@@ -24,7 +24,7 @@ ByteString ToByteString(const std::string& str);
 ByteString ToByteString(const char* c_ptr, size_t size);
 
 
-// The class provides a type which can be used by crypt functions.
+// The class provides a type which can be used by base functions.
 // It can be constructed with ByteString.
 // It supports copy and move operations.
 // Use code.value() to get a ByteString.
@@ -173,6 +173,52 @@ Code Rsa1024(const Code& text, const Code& exponent, const Code& modulus);
 class DecryptError : public std::logic_error {
  public:
   explicit DecryptError(const std::string &s) : std::logic_error(s) {}
+};
+
+// Network Protocol
+
+class RequestProtocol : public CodableInterface{
+ public:
+  RequestProtocol(const Code& user_token, Byte opt
+          , const Code& data_key = Code(), const Code& data_ = Code());
+
+  Code Encode() override;
+  void Decode(const Code& code) override;
+
+  Code UserToken() const;
+  Byte Option() const;
+  size_t DataLength() const;
+  Code DataKey() const;
+  Code Data() const;
+  Code HmacKey() const;
+  Code HmacCode() const;
+ private:
+  Code user_token_;
+  Byte opt_;
+  Byte padding_[7];
+  size_t data_length_;
+  Code data_key_;
+  Code data_;
+  Code hmac_;
+};
+
+class ResponseProtocol : public CodableInterface {
+ public:
+  ResponseProtocol(size_t status_, const Code& hmac_key
+                   , const Code& data = Code());
+
+  Code Encode() override;
+  void Decode(const Code& code) override;
+
+  size_t Status() const;
+  size_t DataLength() const;
+  Code Data() const;
+  Code HmacCode() const;
+ private:
+  size_t status_;
+  size_t data_length_;
+  Code data_;
+  Code hmac_;
 };
 
 }  // namespace littledb

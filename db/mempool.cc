@@ -6,9 +6,9 @@
 #include <exception>
 
 namespace littledb {
-size_t MemPool::kBlockSize = 4096;
-
-MemPool::MemPool() : allocate_ptr_(nullptr), used_bytes_(0), pool_() {
+MemPool::MemPool()
+    : allocate_ptr_(nullptr), allocated_bytes_(0)
+      , remain_bytes_(0), pool_() {
   pool_.push_back(new char[kBlockSize]);
   allocate_ptr_ = pool_.back();
 }
@@ -25,18 +25,16 @@ char* MemPool::Allocate(size_t bytes) {
   }
 
   if (bytes > 1024) {
-    used_bytes_ += bytes;
-    allocated_bytes_ = 0;
+    allocated_bytes_ += bytes;
+    remain_bytes_ = 0;
 
     pool_.push_back(new char[bytes]);
-    pool_.push_back(new char[kBlockSize]);
-    return *(pool_.end() - 2);
+    return pool_.back();
   }
 
-  auto remain_bytes = allocate_ptr_ - pool_.back();
-  if (remain_bytes < bytes) {
-    used_bytes_ += kBlockSize;
-    allocated_bytes_ = 0;
+  if (remain_bytes_ < bytes) {
+    allocated_bytes_ += kBlockSize;
+    remain_bytes_ = kBlockSize - bytes;
 
     pool_.push_back(new char[kBlockSize]);
     allocate_ptr_ = pool_.back() + bytes;
@@ -45,12 +43,16 @@ char* MemPool::Allocate(size_t bytes) {
 
   auto result = allocate_ptr_;
   allocate_ptr_ += bytes;
-  allocated_bytes_ += bytes;
+  remain_bytes_ -= bytes;
   return result;
 }
 
 size_t MemPool::UsageBytes() const {
-  return used_bytes_ + allocated_bytes_;
+  return allocated_bytes_ - remain_bytes_;
+}
+
+size_t MemPool::AllocatedBytes() const {
+  return allocated_bytes_;
 }
 
 }

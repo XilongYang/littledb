@@ -10,10 +10,18 @@
 
 namespace littledb{
 
+class NotFoundError : public std::runtime_error {
+ public:
+  explicit NotFoundError(const std::string& str = "") : std::runtime_error(str) {}
+};
+
 
 class SkipList {
  public:
-  SkipList(MemPool* mem_pool);
+  explicit SkipList(MemPool* mem_pool);
+
+  SkipList(const SkipList&) = delete;
+  SkipList& operator=(const SkipList&) = delete;
 
   static size_t GetMaxHeight();
 
@@ -27,8 +35,8 @@ class SkipList {
   static size_t kMaxHeight;
   static size_t RandomLevel();
 
-  Node* const head_;
   MemPool* const mem_pool_;
+  Node* const head_;
 
   Node* FindGreaterOrEqual(const InnerKey& key, Node** prev = nullptr) const;
   Node* FindLessThan(const InnerKey& key) const;
