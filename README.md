@@ -1,4 +1,4 @@
-# Little Crypt
+# LittleDB
 
 ![license](https://img.shields.io/github/license/XilongYang/littledb)
 ![cmake](https://img.shields.io/badge/CMake%20Version-%3E%3D3.16-green)
@@ -6,7 +6,7 @@
 ![gtest](https://img.shields.io/badge/Googletest-v1.10-green)
 ![build](https://img.shields.io/github/workflow/status/XilongYang/littledb/CMake)
 
-A simple C++ library provides some encrypt/decrypt concerned interfaces and functions such as SHA, HMAC and AES.
+A simple C++ library provides an embedded K-V database and some encrypt/decrypt concerned functions.
 
 ## Build
 
@@ -30,7 +30,7 @@ cd build/test
 ## Usage
 
 This project is a static library. So you can use it by simply copy the `include\littledb.h` to you project include 
-path and link the `liblittle_crypt.a` to you project.
+path and link the `liblittledb.a` to you project.
 
 For example:
 
@@ -41,7 +41,7 @@ For example:
 //    ├── include
 //    │   └── littledb.h
 //    └── lib
-//        └── liblittle_crypt.a
+//        └── liblittledb.a
 
 //main.cc
 
@@ -62,7 +62,7 @@ int main() {
 
 ```bash
 # workdir=Test
-g++ -o main main.cc -Lthird_party/lib -llittle_crypt
+g++ -o main main.cc -Lthird_party/lib -llittledb
 ./main
 ```
 
