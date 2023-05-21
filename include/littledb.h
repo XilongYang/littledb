@@ -11,17 +11,34 @@
 
 namespace littledb {
 // Using std::size_t as our size type.
-using std::size_t;
+using Size = std::size_t;
 
 // Using the 8bit unsigned int for Byte type.
 using Byte = uint8_t;
 
-// Using the string which contains 8bit unsigned int for ByteString type.
-using ByteString = std::basic_string<Byte>;
+/** ByteString: string that base on Bytes.
+ *
+ */
+class ByteString {
+    class ByteStringImpl;
+public:
+    ByteString();
+    ByteString(Size size, Byte byte);
 
-// Convert std::string and C style string to ByteString.
-ByteString ToByteString(const std::string& str);
-ByteString ToByteString(const char* c_ptr, size_t size);
+    /** Convert std::string to ByteString.
+     *  str: reference of the source string.
+     */
+    static ByteString ToByteString(const std::string& str);
+
+    /** Convert C style string to ByteString.
+     *  c_ptr: pointer to first char of the source string.
+     *  size: number of char in the source string.
+     */
+    static ByteString ToByteString(const char* c_ptr, Size size);
+private:
+    ByteStringImpl* impl_;
+};
+
 
 
 // The class provides a type which can be used by base functions.
@@ -48,15 +65,16 @@ class Code {
   const Code operator+(const Code& code) const;
   Code& operator+=(const Code& code);
 
-  // The function provides a transform from inner types to Code.
-  // Note it only worked for the top type, that means
-  // if you pass a pointer in the function, it will only transform
-  // the pointer itself rather than the object that the pointer referenced.
-  // For example:
-  // BaseToCode(int i) will return a Code which include 4 bytes(depends on
-  // system) that is the code of i.
-  // BaseToCode(char *str) will return a Code which also include 4 bytes(depends
-  // on system) that is the code of the pointer.
+  /** The function provides a transform from inner types to Code.
+   *  Note it only worked for the top type, that means
+   *  if you pass a pointer in the function, it will only transform
+   *  the pointer itself rather than the object that the pointer referenced.
+   *  For example:
+   *    BaseToCode(int i) will return a Code which include 4 Bytes(depends on
+   *      system) which represents the code of i.
+   *    BaseToCode(char *str) will return a Code which also include 4 Bytes(depends
+   *      on system) which represents the code of the pointer(not the contents).
+   */
   template <typename T>
   static Code BaseToCode(const T& target) {
     ByteString result;

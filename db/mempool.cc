@@ -6,6 +6,7 @@
 #include <exception>
 
 namespace littledb {
+
 MemPool::MemPool()
     : allocate_ptr_(nullptr), allocated_bytes_(0)
       , remain_bytes_(0), pool_() {
