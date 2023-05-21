@@ -11,7 +11,7 @@ include_directories(third_party)
 add_library(littledb
         include/littledb.h
         base/byte_string.cc
-        base/code_impl.cc
+        base/code.cc
         base/sha256.cc
         base/hmac.cc
         base/aes128.cc
