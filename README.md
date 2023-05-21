@@ -1,10 +1,10 @@
 # LittleDB
 
-![license](https://img.shields.io/github/license/XilongYang/littledb)
-![cmake](https://img.shields.io/badge/CMake%20Version-%3E%3D3.16-green)
-![cpp](https://img.shields.io/badge/C%2B%2B%20Version-17-green)
-![gtest](https://img.shields.io/badge/Googletest-v1.10-green)
-![build](https://img.shields.io/github/workflow/status/XilongYang/littledb/CMake)
+![license](https://img.shields.io/github/license/XilongYang/littledb?style=flat-square)
+![cmake](https://img.shields.io/badge/CMake%20Version-%3E%3D3.16-green?style=flat-square)
+![cpp](https://img.shields.io/badge/C%2B%2B%20Version-17-green?style=flat-square)
+![gtest](https://img.shields.io/badge/Googletest-v1.10-green?style=flat-square)
+![build](https://img.shields.io/github/actions/workflow/status/XilongYang/littledb/cmake.yml?style=flat-square)
 
 A simple C++ library provides an embedded K-V database and some encrypt/decrypt concerned functions.
 
