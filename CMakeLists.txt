@@ -16,6 +16,8 @@ add_library(littledb
         base/hmac.cc
         base/aes128.cc
         base/rsa1024.cc
+        base/request_protocol.cc 
+        base/response_protocol.cc
         db/mempool.cc
         db/mempool.h
         db/skip_list.cc
@@ -23,7 +25,8 @@ add_library(littledb
         db/inner_key.cc
         db/inner_key.h
         db/memtable.cc
-        db/memtable.h base/request_protocol.cc base/response_protocol.cc)
+        db/memtable.h 
+)
 
 enable_testing()
 add_subdirectory(base/test)
