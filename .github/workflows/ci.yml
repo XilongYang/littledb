@@ -30,4 +30,4 @@ jobs:
 
       - name: Test
         run: |
-          ctest --test-dir build --output-on-failure
+          ctest --test-dir build -V
